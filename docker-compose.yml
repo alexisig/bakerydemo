@@ -8,18 +8,12 @@ services:
       POSTGRES_PASSWORD: changeme
     restart: always
     image: postgres:9.6
-    expose:
-      - "5432"
   redis:
     restart: always
     image: redis:3.0
-    expose:
-      - "6379"
   elasticsearch:
     image: elasticsearch:2.3
     restart: always
-    expose:
-      - "9200"
   app:
     environment:
       DJANGO_SECRET_KEY: changeme
@@ -35,8 +29,10 @@ services:
       - db:db
       - redis:redis
       - elasticsearch:elasticsearch
-    ports:
-      - "8000:8000"
+    labels:
+      - traefik.http.services.wagtail.loadbalancer.server.port=8000
+      - traefik.http.routers.wagtail.rule=Host(`wagtail.alexisig.com`)
+      - traefik.http.routers.wagtail.tls.certresolver=le
     depends_on:
       - db
       - redis
